@@ -7,8 +7,13 @@ const Notes = require('../models/Notes');
 
 //ROUTE 1 : Get all the notes using: GET "/api/notes/getallnotes". login is required
 router.get('/fetchallnotes', fetchuser, async (req, res) => {
-    const notes = await Notes.find({ user: req.user.id });
-    res.json(notes)
+    try {
+        const notes = await Notes.find({ user: req.user.id });
+        res.json(notes);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 })
 
 
@@ -19,22 +24,22 @@ router.post('/addnote', fetchuser, [
     body('title', 'Enter a valid Title').isLength({ min: 3 }),
     body('description', 'Description must be atleast 5 characters').isLength({ min: 5 }),
 ], async (req, res) => {
-
-    const { title, description, tag } = req.body;
-
-    //if there are error return bad req and the error
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        // return res.send(`Hello, ${req.query.person}!`);
-        return res.status(400).json({ errors: errors.array() });
-    }
-
     try {
+        const { title, description, tag } = req.body;
+
+        //if there are error return bad req and the error
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            // return res.send(`Hello, ${req.query.person}!`);
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+
         const note = new Notes({
             title, description, tag, user: req.user.id
         })
         const savedNote = await note.save()
-        res.send(savedNote)
+        res.json(savedNote)
     } catch (error) {
         console.log(error.message);
         res.status(500).send("Internal Server Error Occurred")
@@ -76,7 +81,7 @@ router.put('/updatenote/:id', fetchuser, async (req, res) => {
 //ROUTE 4 : Delete the existing notes using: Post "/api/notes/deletenote". login is required 
 
 router.delete('/deletenote/:id', fetchuser, async (req, res) => {
-    const { title, description, tag } = req.body;
+  
 
     //we have to verify that the notes belong to person who is deleting the note 
     try {

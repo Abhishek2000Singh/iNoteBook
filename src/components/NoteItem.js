@@ -1,15 +1,23 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import noteContext from '../context/notes/noteContext';
+import { useContext } from 'react';
 
 const NoteItem = (props) => {
-    const { note } = props;
+    const { note, updateNote } = props;
+    const context = useContext(noteContext)
+    const { deleteNote } = context;
     return (
         <div className='col-md-3'>
-            <div class="card my-3">
-                <div class="card-body">
-                    <h5 class="card-title">{note.title}</h5>
-                    <p class="card-text">{note.description} Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut ab perferendis impedit necessitatibus blanditiis beatae a, explicabo temporibus nemo at illo animi hic nesciunt veniam ratione debitis labore quod amet sequi ex numquam sapiente.</p>
-                    {/* <Link to="/" class="btn btn-primary">Go somewhere</Link> */}
+            <div className="card my-3">
+                <div className="card-body">
+                    <div className="d-flex align-items-center">
+                        <h5 className="card-title">{note.title}</h5>
+                        <i className="far fa-trash-alt mx-2" onClick={() => {
+                            deleteNote(note._id);props.showAlert("Deleted Successfully", "success");}}></i>
+                        <i className="far fa-edit mx-2" onClick={() => { updateNote(note) }}></i>
+                    </div>
+                    <p className="card-text">{note.description}</p>
+
                 </div>
             </div>
         </div>
